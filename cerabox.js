@@ -3,9 +3,11 @@
  * 
  * @author 		Sven
  * @since 		13-01-2011
- * @version 	1.2.19-r
+ * @version 	1.2.20
  * 
- * This package requires MooTools 1.3.* + MooTools More Assets
+ * This package requires
+ * - MooTools 1.3.2 >
+ * - MooTools More Assets
  * 
  * @license The MIT License
  * 
@@ -176,7 +178,7 @@ var CeraBox = new Class({
 					this.showInline(index, options);
 				}.bind(this));
 			}
-			else if (item.get('href').replace(/(\?.*)/,'').test(/\.jpg|jpeg|png|gif$/i)) {
+			else if (item.get('href').test(/\.(jpg|jpeg|png|gif|bmp)(.*)?$/i)) {
 				item.addEvent('click', function(event){
 					if (event)
 						event.preventDefault();
@@ -291,7 +293,7 @@ var CeraBox = new Class({
 					ceraBox._transformItem(dimension.width, dimension.height);
 				}	
 				
-				ceraBox.vars.cerabox.getElement('.cerabox-content').set('tween', {duration: 300}).tween('opacity','0')
+				ceraBox.vars.cerabox.getElement('.cerabox-content').set('tween', {duration: 300}).tween('opacity',0)
 					.get('tween')
 					.addEvent('complete', function(){
 						this.removeEvents('complete');
@@ -306,7 +308,7 @@ var CeraBox = new Class({
 						
 						ceraBox.vars.cerabox.getElement('.cerabox-content')
 							.empty()
-							.set('opacity',0)
+							.setStyle('opacity',0)
 							.set('html', ajaxEle);
 						
 						ceraBox._openWindow(dimension.width, dimension.height, options.animation?options.animation:'fade', index);
@@ -367,7 +369,7 @@ var CeraBox = new Class({
 				ceraBox._transformItem(dimension.width, dimension.height);
 			}
 
-			ceraBox.vars.cerabox.getElement('.cerabox-content').set('tween', {duration: 300}).tween('opacity','0')
+			ceraBox.vars.cerabox.getElement('.cerabox-content').set('tween', {duration: 300}).tween('opacity',0)
 				.get('tween')
 				.addEvent('complete', function(){
 					this.removeEvents('complete');
@@ -382,7 +384,7 @@ var CeraBox = new Class({
 
 					ceraBox.vars.cerabox.getElement('.cerabox-content')
 						.empty()
-						.set('opacity',0)
+						.setStyle('opacity',0)
 						.adopt(inlineEle);
 
 					ceraBox._openWindow(dimension.width, dimension.height, options.animation?options.animation:'fade', index);
@@ -440,7 +442,7 @@ var CeraBox = new Class({
 					ceraBox._transformItem(dimension.width, dimension.height);
 				}
 				
-				ceraBox.vars.cerabox.getElement('.cerabox-content').set('tween', {duration: 300}).tween('opacity','0')
+				ceraBox.vars.cerabox.getElement('.cerabox-content').set('tween', {duration: 300}).tween('opacity',0)
 					.get('tween')
 					.addEvent('complete', function(){
 						this.removeEvents('complete');
@@ -455,7 +457,7 @@ var CeraBox = new Class({
 						
 						ceraBox.vars.cerabox.getElement('.cerabox-content')
 							.empty()
-							.set('opacity','0')
+							.setStyle('opacity',0)
 							.adopt(image);
 						
 						ceraBox._openWindow(dimension.width, dimension.height, options.animation?options.animation:'fade', index);
@@ -505,7 +507,7 @@ var CeraBox = new Class({
 			ceraBox._transformItem(dimension.width, dimension.height);
 		}
 		
-		ceraBox.vars.cerabox.getElement('.cerabox-content').set('tween', {duration: 300}).tween('opacity','0')
+		ceraBox.vars.cerabox.getElement('.cerabox-content').set('tween', {duration: 300}).tween('opacity',0)
 			.get('tween')
 			.addEvent('complete', function(){
 				this.removeEvents('complete');
@@ -520,7 +522,7 @@ var CeraBox = new Class({
 				
 				ceraBox.vars.cerabox.getElement('.cerabox-content')
 					.empty()
-					.set('opacity',0)
+					.setStyle('opacity',0)
 					.adopt(swfEr);
 				
 				ceraBox._openWindow(dimension.width, dimension.height, options.animation?options.animation:'fade', index);
@@ -598,7 +600,7 @@ var CeraBox = new Class({
 		// Open it so onload fires
 		this.vars.cerabox.getElement('.cerabox-content')
 			.empty()
-			.set('opacity',0)
+			.setStyle('opacity',0)
 			.adopt(ceraIframe);
 	},
 	
@@ -617,12 +619,12 @@ var CeraBox = new Class({
 		
 		var ceraBox = this;
 		
-		ceraBox.vars.cerabox.set('tween', {duration: 50}).tween('opacity', '0').get('tween')
+		ceraBox.vars.cerabox.set('tween', {duration: 50}).tween('opacity', 0).get('tween')
 			.addEvent('complete', function() {
 				this.removeEvents('complete');
 				
 				this.element.setStyle('display','none');
-				document.id('cerabox-background').set('tween', {duration: 150,link:'chain'}).tween('opacity','0').tween('display','none').get('tween')
+				document.id('cerabox-background').set('tween', {duration: 150,link:'chain'}).tween('opacity',0).tween('display','none').get('tween')
 					.addEvent('chainComplete', function() {
 						this.removeEvents('chainComplete');
 
@@ -689,7 +691,7 @@ var CeraBox = new Class({
 		
 		var items = this.vars.items[index[0]];
 		
-		this.vars.cerabox.getElement('.cerabox-content').set('tween', {duration: 300}).tween('opacity','0')
+		this.vars.cerabox.getElement('.cerabox-content').set('tween', {duration: 300}).tween('opacity',0)
 			.get('tween')
 			.addEvent('complete', function(){
 				this.removeEvents('complete');
@@ -699,9 +701,9 @@ var CeraBox = new Class({
 				
 				ceraBox.vars.cerabox.getElement('.cerabox-content')
 					.empty()
-					.set('opacity',0)
+					.setStyle('opacity',0)
 					.adopt(new Element('span',{'text':ceraBox.options.errorLoadingMessage}))
-					.set('tween', {duration: 100}).tween('opacity','1');
+					.set('tween', {duration: 100}).tween('opacity',1);
 				
 				ceraBox._openWindow(250, 50, options.animation?options.animation:'fade', index);
 				
@@ -832,8 +834,8 @@ var CeraBox = new Class({
 
 		if (this.vars.windowOpen==true) {
 			this.vars.cerabox.getElement('.cerabox-content')
-				.set('opacity',0)
-				.set('tween', {duration: 200}).tween('opacity','1')
+				.setStyle('opacity',0)
+				.set('tween', {duration: 200}).tween('opacity',1)
 				.get('tween')
 				.addEvent('complete', function(){
 					this.removeEvents('complete');
@@ -851,7 +853,7 @@ var CeraBox = new Class({
 			return;
 		}
 		
-		this.vars.cerabox.getElement('.cerabox-content').set('opacity','1');
+		this.vars.cerabox.getElement('.cerabox-content').setStyle('opacity',1);
 
 		// onOpen event
 		if (null!==this.options.events._onOpen)
@@ -904,7 +906,7 @@ var CeraBox = new Class({
 			Object.append(morphObject, {
 				'width':width,
 				'height':height,
-				'opacity':'1'
+				'opacity':1
 			});
 
 			this.vars.cerabox.setStyles({
@@ -939,7 +941,7 @@ var CeraBox = new Class({
 				'opacity':0
 			});
 
-			this.vars.cerabox.setStyles(morphObject).set('tween', {duration: 200}).tween('opacity', '1')
+			this.vars.cerabox.setStyles(morphObject).set('tween', {duration: 200}).tween('opacity', 1)
 				.get('tween')
 				.addEvent('complete', function(){
 					this.removeEvents('complete');
@@ -965,7 +967,7 @@ var CeraBox = new Class({
 	 * Display transparen overlay
 	 */
 	_displayOverlay: function() {
-		document.id('cerabox-background').setStyles({'display':'block','opacity':'.5','height':document.id(document.body).getScrollSize().y + 'px','width':document.id(document.body).getScrollSize().x + 'px'});
+		document.id('cerabox-background').setStyles({'display':'block','opacity':.5,'height':document.id(document.body).getScrollSize().y + 'px','width':document.id(document.body).getScrollSize().x + 'px'});
 	},
 	
 	/**
