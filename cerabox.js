@@ -3,10 +3,10 @@
  * 
  * @author 		Sven
  * @since 		13-01-2011
- * @version 	1.2.20
+ * @version 	1.2.21
  * 
  * This package requires
- * - MooTools 1.3.2 >
+ * - MooTools 1.4 >
  * - MooTools More Assets
  * 
  * @license The MIT License
@@ -340,14 +340,14 @@ var CeraBox = new Class({
 		// Inline content
 		var inlineEle   = (currentItem.get('href').test(/^#\$/i) && typeof window[currentItem.get('href').replace(/^#\$/i,'')] != 'undefined')
 			? ((typeof window[currentItem.get('href').replace(/^#\$/i,'')] != 'object') ? new Element('div',{'html':window[currentItem.get('href').replace(/^#\$/i,'')]}) : window[currentItem.get('href').replace(/^#\$/i,'')])
-			: (document.id(document.body).getElement(currentItem.get('href')) ? document.id(document.body).getElement(currentItem.get('href')).clone(true, true) : null);
+			: (document.id(document.body).getElement(currentItem.get('href')) ? document.id(document.body).getElement(currentItem.get('href')).clone() : null);
 
 		if (null!==inlineEle) {
 
 			if (false!==options.displayOverlay)
 				ceraBox._displayOverlay();
 
-			var inlineEleClone = ceraBox.vars.cerabox.getElement('#cerabox-ajaxPreLoader').empty().adopt(inlineEle.clone(true, true));
+			var inlineEleClone = ceraBox.vars.cerabox.getElement('#cerabox-ajaxPreLoader').empty().adopt(inlineEle.clone());
 			// Needed to know its size
 			ceraBox.vars.cerabox.setStyle('display','block');
 			
