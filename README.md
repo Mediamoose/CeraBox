@@ -6,7 +6,7 @@ CeraBox is the alternative Lightbox build on MooTools, inspired by Fancybox.net.
 Requirements
 ------
 
-* MooTools 1.3.2 >
+* MooTools 1.4 >
 * MooTools More Assets
 
 Usage
