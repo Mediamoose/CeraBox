@@ -41,22 +41,16 @@ Add the following script somewhere in your document to make it work.
 
     <script type="text/javascript">
 		window.addEvent('domready', function(){
-			var box = new CeraBox();
-			box.addItems('.gallery a.ceraBox');
+			$$('.gallery a.ceraBox').cerabox();
 		});
 	</script>
 
 
 Examples
 --------
-Initialize:
-
-	var box = new CeraBox();
-
-
 Collection (ease animation) and loader on selected item:
 
-	box.addItems('#example1 a', {
+	$$('#example1 a').cerabox({
 		animation: 'ease',
 		loaderAtItem: true
 	});
@@ -64,7 +58,7 @@ Collection (ease animation) and loader on selected item:
 
 Ajax:
 
-	box.addItems('#example3 a.ajax', {
+	$$('#example3 a.ajax').cerabox({
 		displayTitle: false,
 		ajax: {
 			type: 'post',
