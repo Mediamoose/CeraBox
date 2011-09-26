@@ -68,10 +68,6 @@
 	box-shadow: 0 0 30px -5px #333;
 }
 
-#cerabox .cerabox-content img {
-	float: left;
-}
-
 #cerabox .cerabox-content span, #cerabox .cerabox-title span {
 	padding: 10px;
 	display: block;
@@ -116,7 +112,8 @@
 	transform-origin: 100% 0;
 }
 
-#cerabox .cerabox-content img {
+#cerabox .cerabox-content img.image {
+	float: left;
 	width: 100%;
 	height: 100%;
 	padding: 0;
@@ -127,7 +124,7 @@
 	vertical-align: top;
 }
 
-#cerabox .cerabox-content iframe {
+#cerabox .cerabox-content iframe.iframe {
 	width: 100%;
 	height: 100%;
 	border: none;
