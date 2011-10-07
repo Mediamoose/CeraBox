@@ -3,7 +3,7 @@
  *
  * @author 		Sven
  * @since 		13-01-2011
- * @version 	1.3.1
+ * @version 	1.3.2
  *
  * This package requires
  * - MooTools 1.4 >
@@ -34,7 +34,7 @@
 
 var CeraBox = CeraBox || new Class({
 
-	version: '1.3.1',
+	version: '1.3.2',
 
 	Implements: [Options],
 
@@ -95,11 +95,20 @@ var CeraBox = CeraBox || new Class({
 	 */
 	initialize: function(elements, options) {
 		this.boxWindow = CeraBoxWindow;
+
+		elements = $$(elements);
+		
+		if (options && typeOf(options.group)!='null' && options.group===false && elements.length>1) {
+			elements.each(function(item){
+				item.store('cerabox', new CeraBox(item, options));
+			});
+		}
+
 		//set options
 		this.setOptions(options);
 
 		// Handle the passed elements
-		$$(elements).each(function(item, index) {
+		elements.each(function(item, index) {
 
 			// Add to collection
 			this.collection[index] = item;
@@ -198,7 +207,7 @@ var CeraBox = CeraBox || new Class({
 							ajaxEle.setStyle('width', ceraBox.options.width?ceraBox.options.width:ajaxEle.getScrollSize().x + 'px');
 							ajaxEle.setStyle('height', ceraBox.options.height?ceraBox.options.height:ajaxEle.getScrollSize().y + 'px');
 
-							var dimension = ceraBox.boxWindow.getSizeElement(ajaxEle, true);
+							var dimension = ceraBox.boxWindow.getSizeElement(ajaxEle);
 
 							ajaxEle = ajaxEle.get('html');
 
@@ -256,7 +265,7 @@ var CeraBox = CeraBox || new Class({
 					inlineEleClone.setStyle('width', ceraBox.options.width?ceraBox.options.width:inlineEleClone.getScrollSize().x + 'px');
 					inlineEleClone.setStyle('height', ceraBox.options.height?ceraBox.options.height:inlineEleClone.getSize().y + 'px');
 
-					var dimension = ceraBox.boxWindow.getSizeElement(inlineEleClone, true);
+					var dimension = ceraBox.boxWindow.getSizeElement(inlineEleClone);
 
 					ceraBox.boxWindow.onLoad(dimension.width, dimension.height)
 						.addEvent('complete', function(){
@@ -415,9 +424,17 @@ var CeraBox = CeraBox || new Class({
 	 */
 	_timedOut: function() {
 
-		var ceraBox = this;
+		var ceraBox = this,
+			errorEle = new Element('span',{'class':'cerabox-error','html':ceraBox.options.errorLoadingMessage});
 
-		ceraBox.boxWindow.onLoad(250, 50)
+		var errorEleClone = ceraBox.boxWindow.preLoadElement(errorEle.clone());
+
+		errorEleClone.setStyle('width', '270px');
+		errorEleClone.setStyle('height', errorEleClone.getSize().y + 'px');
+
+		var dimension = ceraBox.boxWindow.getSizeElement(errorEleClone, true);
+
+		ceraBox.boxWindow.onLoad(dimension.width, dimension.height)
 			.addEvent('complete', function(){
 				this.removeEvents('complete');
 
@@ -426,8 +443,8 @@ var CeraBox = CeraBox || new Class({
 
 				ceraBox.boxWindow.hideTitle();
 
-				ceraBox.boxWindow.setContent(new Element('span',{'text':ceraBox.options.errorLoadingMessage}))
-					.openWindow(250, 50);
+				ceraBox.boxWindow.setContent(errorEle)
+					.openWindow();
 			});
 	},
 
@@ -806,7 +823,7 @@ var CeraBoxWindow = (function(window) {
 		 */
 		displayTitle: function(text, number, total) {
 
-			if (total>0) {
+			if (total>1) {
 				text = currentInstance.options.titleFormat.substitute({
 					'number': number,
 					'total': total,
@@ -1136,7 +1153,8 @@ var CeraBoxWindow = (function(window) {
 			'top':      0,
 			'left':     0,
 			'height':   '100%',
-			'width':    '100%'
+			'width':    '100%',
+			'position': 'fixed'
 		};
 
 		// iOS does not support position fixed
@@ -1145,7 +1163,8 @@ var CeraBoxWindow = (function(window) {
 				'top': 0,
 				'left': 0,
 				'width':  (document.id(document.body).getScrollSize().x) + 'px',
-				'height': (document.id(document.body).getScrollSize().y) + 'px'
+				'height': (document.id(document.body).getScrollSize().y) + 'px',
+				'position': 'absolute'
 			});
 		}
 

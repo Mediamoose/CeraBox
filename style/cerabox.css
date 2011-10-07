@@ -68,7 +68,7 @@
 	box-shadow: 0 0 30px -5px #333;
 }
 
-#cerabox .cerabox-content span, #cerabox .cerabox-title span {
+#cerabox span.cerabox-error, #cerabox .cerabox-title span {
 	padding: 10px;
 	display: block;
 	font-family: Helvetica;
@@ -76,6 +76,7 @@
 	color: #000;
 	line-height: normal;
 }
+#cerabox span.cerabox-error { text-align: justify; }
 #cerabox .cerabox-title span { display: none; color: #fff; }
 
 #cerabox .cerabox-title {
