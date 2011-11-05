@@ -440,8 +440,17 @@ var CeraBox = CeraBox || new Class({
 
 		var errorEleClone = ceraBox.boxWindow.preLoadElement(errorEle.clone());
 
-		errorEleClone.setStyle('width', '270px');
-		errorEleClone.setStyle('height', errorEleClone.getSize().y + 'px');
+		errorEleClone.setStyles({
+			'width': '270px',
+			'height': errorEleClone.getSize().y + 'px'
+		});
+
+		if (this.options.mobileView)
+			errorEle.setStyles({
+				'position': 'absolute',
+				'top': '50%',
+				'margin-top': -Math.round(errorEleClone.getSize().y/2) + 'px'
+			});
 
 		var dimension = ceraBox.boxWindow.getSizeElement(errorEleClone, true);
 
@@ -1021,6 +1030,8 @@ var CeraBoxWindow = (function(window) {
 		}
 		
 		if (currentInstance.options.mobileView) {
+			document.id(document.body).setStyle('overflow','hidden');
+
 			var landscape = Math.abs(window.orientation) == 90,
 				screenWidth = landscape ? screen.height : screen.width,
 				scaledWidth,
@@ -1041,6 +1052,10 @@ var CeraBoxWindow = (function(window) {
 				});
 			}
 			else {
+				if (!cerabox.getElement('.cerabox-content img')) {
+					width = Math.round(viewport.x * (screenWidth / viewport.x));
+					height = Math.round(viewport.y * (screenWidth / viewport.x));
+				}
 				scaledWidth = Math.round(viewport.x * (screenWidth / viewport.x)),
 				scaledHeight = Math.round(viewport.y * (screenWidth / viewport.x)),
 				scale = (scaledHeight < (height * scaledWidth / width)? scaledHeight / height : scaledWidth / width),
