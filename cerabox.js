@@ -58,6 +58,8 @@ var CeraBox = CeraBox || new Class({
 		titleFormat:                'Item {number} / {total} {title}',
 		addContentProtectionLayer:  false,
 		mobileView:                 Browser.Platform.ios || Browser.Platform.android || Browser.Platform.webos,
+		fixedPosition:              false,
+		clickToCloseOverlay:        true,
 		events: {
 			onOpen:			function(currentItem, collection){},
 			onChange:		function(currentItem, collection){},
@@ -1051,6 +1053,7 @@ var CeraBoxWindow = (function(window) {
 			}
 
 			cerabox.setStyles({
+				'position': 'absolute',
 				'display':'block',
 				'width':scaledWidth + 'px',
 				'height':scaledHeight + 'px',
@@ -1090,6 +1093,7 @@ var CeraBoxWindow = (function(window) {
 			};
 
 			cerabox.setStyles({
+				'position': (currentInstance.options.fixedPosition?'fixed':'absolute'),
 				'top':Math.round((viewport.y/2)) + 'px',
 				'left':Math.round((viewport.x/2)) + 'px',
 				'right':'auto',
@@ -1097,17 +1101,17 @@ var CeraBoxWindow = (function(window) {
 			});
 
 			if (/*viewport.x > cerabox.getSize().x+40 &&*/ viewport.x > width+60) {
-				morphObject['margin-left'] = Math.round((-width/2)+document.id(document.body).getScroll().x) + 'px';
+				morphObject['margin-left'] = Math.round((-width/2) + (!currentInstance.options.fixedPosition?document.id(document.body).getScroll().x:0)) + 'px';
 			}
 			else {
-				morphObject['margin-left'] = Math.round(((viewport.x/2)-width-40)+document.id(document.body).getScroll().x) + 'px';
+				morphObject['margin-left'] = Math.round(((viewport.x/2)-width-40) + (!currentInstance.options.fixedPosition?document.id(document.body).getScroll().x:0)) + 'px';
 			}
 
 			if (/*viewport.y > cerabox.getSize().y+40 &&*/ viewport.y > height+40) {
-				morphObject['margin-top'] = Math.round((-height/2)+document.id(document.body).getScroll().y) + 'px';
+				morphObject['margin-top'] = Math.round((-height/2) + (!currentInstance.options.fixedPosition?document.id(document.body).getScroll().y:0)) + 'px';
 			}
 			else {
-				morphObject['margin-top'] = Math.round((-viewport.y/2+20)+document.id(document.body).getScroll().y) + 'px';
+				morphObject['margin-top'] = Math.round((-viewport.y/2+20) + (!currentInstance.options.fixedPosition?document.id(document.body).getScroll().y:0)) + 'px';
 			}
 
 			// Reset from mobile if needed
@@ -1128,8 +1132,8 @@ var CeraBoxWindow = (function(window) {
 					});
 					return cerabox.setStyles({
 								'display':'block',
-								'left':currentItem.getPosition().x + 'px',
-								'top':currentItem.getPosition().y + 'px',
+								'left':(currentItem.getPosition().x - (currentInstance.options.fixedPosition?document.id(document.body).getScroll().x:0)) + 'px',
+								'top':(currentItem.getPosition().y - (currentInstance.options.fixedPosition?document.id(document.body).getScroll().y:0)) + 'px',
 								'width':currentItem.getSize().x + 'px',
 								'height':currentItem.getSize().y + 'px',
 								'margin':0,
@@ -1261,7 +1265,7 @@ var CeraBoxWindow = (function(window) {
 		if (!wrapper.getElement('#cerabox')) {
 			wrapper.adopt([
 				new Element('div',{'id':'cerabox-loading'}).adopt(new Element('div')),
-				new Element('div',{'id':'cerabox-background', 'events':{'click':function(event){event.stop();_instance.close()}}}),
+				new Element('div',{'id':'cerabox-background', 'events':{'click':function(event){event.stop();if(currentInstance.options.clickToCloseOverlay)_instance.close()}}}),
 				cerabox = new Element('div',{'id':'cerabox'}).adopt([
 				                                    new Element('div', {'class':'cerabox-content'}),
 				                                    new Element('div', {'class':'cerabox-title'}).adopt(new Element('span')),
