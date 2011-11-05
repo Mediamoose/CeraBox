@@ -3,7 +3,7 @@
  *
  * @author 		Sven
  * @since 		13-01-2011
- * @version 	1.3.2
+ * @version 	1.3.3
  *
  * This package requires
  * - MooTools 1.4 >
@@ -34,7 +34,7 @@
 
 var CeraBox = CeraBox || new Class({
 
-	version: '1.3.2',
+	version: '1.3.3',
 
 	Implements: [Options],
 
@@ -58,6 +58,8 @@ var CeraBox = CeraBox || new Class({
 		titleFormat:                'Item {number} / {total} {title}',
 		addContentProtectionLayer:  false,
 		mobileView:                 Browser.Platform.ios || Browser.Platform.android || Browser.Platform.webos,
+		fixedPosition:              false,
+		clickToCloseOverlay:        true,
 		events: {
 			onOpen:			function(currentItem, collection){},
 			onChange:		function(currentItem, collection){},
@@ -191,43 +193,48 @@ var CeraBox = CeraBox || new Class({
 
 					if (false===ceraBox.boxWindow.getBusy())
 						return;
-
+					
 					// pre load images
-					var assets = [null];
+					var assets = [];
 					Array.each(responseElements, function(ele){
 						if(ele.get('tag')=='img' && ele.get('src')) {
 							assets.append([ele.get('src')]);
 						}
 					});
 
-					Asset.images(assets, {
-						onComplete: function(){
-							var ajaxEle = ceraBox.boxWindow.preLoadElement(responseTree);
+					var assetsLoaded = function(){
+						var ajaxEle = ceraBox.boxWindow.preLoadElement(responseTree);
 
-							ajaxEle.setStyle('width', ceraBox.options.width?ceraBox.options.width:ajaxEle.getScrollSize().x + 'px');
-							ajaxEle.setStyle('height', ceraBox.options.height?ceraBox.options.height:ajaxEle.getScrollSize().y + 'px');
+						ajaxEle.setStyle('width', ceraBox.options.width?ceraBox.options.width:ajaxEle.getScrollSize().x + 'px');
+						ajaxEle.setStyle('height', ceraBox.options.height?ceraBox.options.height:ajaxEle.getScrollSize().y + 'px');
 
-							var dimension = ceraBox.boxWindow.getSizeElement(ajaxEle);
+						var dimension = ceraBox.boxWindow.getSizeElement(ajaxEle);
 
-							ajaxEle = ajaxEle.get('html');
+						ajaxEle = ajaxEle.get('html');
 
-							ceraBox.boxWindow.onLoad(dimension.width, dimension.height)
-								.addEvent('complete', function(){
-									this.removeEvents('complete');
+						ceraBox.boxWindow.onLoad(dimension.width, dimension.height)
+							.addEvent('complete', function(){
+								this.removeEvents('complete');
 
-									if (false===ceraBox.boxWindow.getBusy())
-										return;
+								if (false===ceraBox.boxWindow.getBusy())
+									return;
 
-									if (false!==ceraBox.options.displayTitle)
-										ceraBox.boxWindow.displayTitle((currentItem.get('title')?currentItem.get('title'):''), ceraBox.currentItem+1, ceraBox.collection.length);
+								if (false!==ceraBox.options.displayTitle)
+									ceraBox.boxWindow.displayTitle((currentItem.get('title')?currentItem.get('title'):''), ceraBox.currentItem+1, ceraBox.collection.length);
 
-									ceraBox.boxWindow.setContent(new Element('div', {'html':ajaxEle}))
-										.openWindow();
-									// Run script from response
-									(function(){eval(responseJavaScript)}).call(ceraBox);
-								});
-						}
-					});
+								ceraBox.boxWindow.setContent(new Element('div', {'html':ajaxEle}))
+									.openWindow();
+								// Run script from response
+								(function(){eval(responseJavaScript)}).call(ceraBox);
+							});
+					}
+
+					if (assets.length)
+						Asset.images(assets, {
+							onComplete: assetsLoaded
+						});
+					else
+						assetsLoaded();
 				},
 				onerror: ceraBox._timedOut.bind(ceraBox),
 				onTimeout: ceraBox._timedOut.bind(ceraBox),
@@ -250,38 +257,42 @@ var CeraBox = CeraBox || new Class({
 		if (null!==inlineEle) {
 
 			// pre load images
-			var assets = [null];
+			var assets = [];
 			Array.each(inlineEle.getElements('img'), function(ele){
 				if(ele.get('src')) {
 					assets.append([ele.get('src')]);
 				}
 			});
 			
-			Asset.images(assets, {
-				onComplete: function(){
+			var assetsLoaded = function(){
+				var inlineEleClone = ceraBox.boxWindow.preLoadElement(inlineEle.clone());
 
-					var inlineEleClone = ceraBox.boxWindow.preLoadElement(inlineEle.clone());
+				inlineEleClone.setStyle('width', ceraBox.options.width?ceraBox.options.width:inlineEleClone.getScrollSize().x + 'px');
+				inlineEleClone.setStyle('height', ceraBox.options.height?ceraBox.options.height:inlineEleClone.getSize().y + 'px');
 
-					inlineEleClone.setStyle('width', ceraBox.options.width?ceraBox.options.width:inlineEleClone.getScrollSize().x + 'px');
-					inlineEleClone.setStyle('height', ceraBox.options.height?ceraBox.options.height:inlineEleClone.getSize().y + 'px');
+				var dimension = ceraBox.boxWindow.getSizeElement(inlineEleClone);
 
-					var dimension = ceraBox.boxWindow.getSizeElement(inlineEleClone);
+				ceraBox.boxWindow.onLoad(dimension.width, dimension.height)
+					.addEvent('complete', function(){
+						this.removeEvents('complete');
 
-					ceraBox.boxWindow.onLoad(dimension.width, dimension.height)
-						.addEvent('complete', function(){
-							this.removeEvents('complete');
+						if (false===ceraBox.boxWindow.getBusy())
+							return;
 
-							if (false===ceraBox.boxWindow.getBusy())
-								return;
+						if (false!==ceraBox.options.displayTitle)
+							ceraBox.boxWindow.displayTitle((currentItem.get('title')?currentItem.get('title'):''), ceraBox.currentItem+1, ceraBox.collection.length);
 
-							if (false!==ceraBox.options.displayTitle)
-								ceraBox.boxWindow.displayTitle((currentItem.get('title')?currentItem.get('title'):''), ceraBox.currentItem+1, ceraBox.collection.length);
+						ceraBox.boxWindow.setContent(inlineEle)
+							.openWindow();
+					});
+			}
 
-							ceraBox.boxWindow.setContent(inlineEle)
-								.openWindow();
-						});
-				}
-			});
+			if (assets.length)
+				Asset.images(assets, {
+					onComplete: assetsLoaded
+				});
+			else
+				assetsLoaded();
 
 		}
 		else {
@@ -429,8 +440,17 @@ var CeraBox = CeraBox || new Class({
 
 		var errorEleClone = ceraBox.boxWindow.preLoadElement(errorEle.clone());
 
-		errorEleClone.setStyle('width', '270px');
-		errorEleClone.setStyle('height', errorEleClone.getSize().y + 'px');
+		errorEleClone.setStyles({
+			'width': '270px',
+			'height': errorEleClone.getSize().y + 'px'
+		});
+
+		if (this.options.mobileView)
+			errorEle.setStyles({
+				'position': 'absolute',
+				'top': '50%',
+				'margin-top': -Math.round(errorEleClone.getSize().y/2) + 'px'
+			});
 
 		var dimension = ceraBox.boxWindow.getSizeElement(errorEleClone, true);
 
@@ -1010,6 +1030,8 @@ var CeraBoxWindow = (function(window) {
 		}
 		
 		if (currentInstance.options.mobileView) {
+			document.id(document.body).setStyle('overflow','hidden');
+
 			var landscape = Math.abs(window.orientation) == 90,
 				screenWidth = landscape ? screen.height : screen.width,
 				scaledWidth,
@@ -1030,6 +1052,10 @@ var CeraBoxWindow = (function(window) {
 				});
 			}
 			else {
+				if (!cerabox.getElement('.cerabox-content img')) {
+					width = Math.round(viewport.x * (screenWidth / viewport.x));
+					height = Math.round(viewport.y * (screenWidth / viewport.x));
+				}
 				scaledWidth = Math.round(viewport.x * (screenWidth / viewport.x)),
 				scaledHeight = Math.round(viewport.y * (screenWidth / viewport.x)),
 				scale = (scaledHeight < (height * scaledWidth / width)? scaledHeight / height : scaledWidth / width),
@@ -1042,6 +1068,7 @@ var CeraBoxWindow = (function(window) {
 			}
 
 			cerabox.setStyles({
+				'position': 'absolute',
 				'display':'block',
 				'width':scaledWidth + 'px',
 				'height':scaledHeight + 'px',
@@ -1081,6 +1108,7 @@ var CeraBoxWindow = (function(window) {
 			};
 
 			cerabox.setStyles({
+				'position': (currentInstance.options.fixedPosition?'fixed':'absolute'),
 				'top':Math.round((viewport.y/2)) + 'px',
 				'left':Math.round((viewport.x/2)) + 'px',
 				'right':'auto',
@@ -1088,17 +1116,17 @@ var CeraBoxWindow = (function(window) {
 			});
 
 			if (/*viewport.x > cerabox.getSize().x+40 &&*/ viewport.x > width+60) {
-				morphObject['margin-left'] = Math.round((-width/2)+document.id(document.body).getScroll().x) + 'px';
+				morphObject['margin-left'] = Math.round((-width/2) + (!currentInstance.options.fixedPosition?document.id(document.body).getScroll().x:0)) + 'px';
 			}
 			else {
-				morphObject['margin-left'] = Math.round(((viewport.x/2)-width-40)+document.id(document.body).getScroll().x) + 'px';
+				morphObject['margin-left'] = Math.round(((viewport.x/2)-width-40) + (!currentInstance.options.fixedPosition?document.id(document.body).getScroll().x:0)) + 'px';
 			}
 
 			if (/*viewport.y > cerabox.getSize().y+40 &&*/ viewport.y > height+40) {
-				morphObject['margin-top'] = Math.round((-height/2)+document.id(document.body).getScroll().y) + 'px';
+				morphObject['margin-top'] = Math.round((-height/2) + (!currentInstance.options.fixedPosition?document.id(document.body).getScroll().y:0)) + 'px';
 			}
 			else {
-				morphObject['margin-top'] = Math.round((-viewport.y/2+20)+document.id(document.body).getScroll().y) + 'px';
+				morphObject['margin-top'] = Math.round((-viewport.y/2+20) + (!currentInstance.options.fixedPosition?document.id(document.body).getScroll().y:0)) + 'px';
 			}
 
 			// Reset from mobile if needed
@@ -1119,8 +1147,8 @@ var CeraBoxWindow = (function(window) {
 					});
 					return cerabox.setStyles({
 								'display':'block',
-								'left':currentItem.getPosition().x + 'px',
-								'top':currentItem.getPosition().y + 'px',
+								'left':(currentItem.getPosition().x - (currentInstance.options.fixedPosition?document.id(document.body).getScroll().x:0)) + 'px',
+								'top':(currentItem.getPosition().y - (currentInstance.options.fixedPosition?document.id(document.body).getScroll().y:0)) + 'px',
 								'width':currentItem.getSize().x + 'px',
 								'height':currentItem.getSize().y + 'px',
 								'margin':0,
@@ -1252,7 +1280,7 @@ var CeraBoxWindow = (function(window) {
 		if (!wrapper.getElement('#cerabox')) {
 			wrapper.adopt([
 				new Element('div',{'id':'cerabox-loading'}).adopt(new Element('div')),
-				new Element('div',{'id':'cerabox-background', 'events':{'click':function(event){event.stop();_instance.close()}}}),
+				new Element('div',{'id':'cerabox-background', 'events':{'click':function(event){event.stop();if(currentInstance.options.clickToCloseOverlay)_instance.close()}}}),
 				cerabox = new Element('div',{'id':'cerabox'}).adopt([
 				                                    new Element('div', {'class':'cerabox-content'}),
 				                                    new Element('div', {'class':'cerabox-title'}).adopt(new Element('span')),
