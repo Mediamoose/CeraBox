@@ -191,43 +191,48 @@ var CeraBox = CeraBox || new Class({
 
 					if (false===ceraBox.boxWindow.getBusy())
 						return;
-
+					
 					// pre load images
-					var assets = [null];
+					var assets = [];
 					Array.each(responseElements, function(ele){
 						if(ele.get('tag')=='img' && ele.get('src')) {
 							assets.append([ele.get('src')]);
 						}
 					});
 
-					Asset.images(assets, {
-						onComplete: function(){
-							var ajaxEle = ceraBox.boxWindow.preLoadElement(responseTree);
+					var assetsLoaded = function(){
+						var ajaxEle = ceraBox.boxWindow.preLoadElement(responseTree);
 
-							ajaxEle.setStyle('width', ceraBox.options.width?ceraBox.options.width:ajaxEle.getScrollSize().x + 'px');
-							ajaxEle.setStyle('height', ceraBox.options.height?ceraBox.options.height:ajaxEle.getScrollSize().y + 'px');
+						ajaxEle.setStyle('width', ceraBox.options.width?ceraBox.options.width:ajaxEle.getScrollSize().x + 'px');
+						ajaxEle.setStyle('height', ceraBox.options.height?ceraBox.options.height:ajaxEle.getScrollSize().y + 'px');
 
-							var dimension = ceraBox.boxWindow.getSizeElement(ajaxEle);
+						var dimension = ceraBox.boxWindow.getSizeElement(ajaxEle);
 
-							ajaxEle = ajaxEle.get('html');
+						ajaxEle = ajaxEle.get('html');
 
-							ceraBox.boxWindow.onLoad(dimension.width, dimension.height)
-								.addEvent('complete', function(){
-									this.removeEvents('complete');
+						ceraBox.boxWindow.onLoad(dimension.width, dimension.height)
+							.addEvent('complete', function(){
+								this.removeEvents('complete');
 
-									if (false===ceraBox.boxWindow.getBusy())
-										return;
+								if (false===ceraBox.boxWindow.getBusy())
+									return;
 
-									if (false!==ceraBox.options.displayTitle)
-										ceraBox.boxWindow.displayTitle((currentItem.get('title')?currentItem.get('title'):''), ceraBox.currentItem+1, ceraBox.collection.length);
+								if (false!==ceraBox.options.displayTitle)
+									ceraBox.boxWindow.displayTitle((currentItem.get('title')?currentItem.get('title'):''), ceraBox.currentItem+1, ceraBox.collection.length);
 
-									ceraBox.boxWindow.setContent(new Element('div', {'html':ajaxEle}))
-										.openWindow();
-									// Run script from response
-									(function(){eval(responseJavaScript)}).call(ceraBox);
-								});
-						}
-					});
+								ceraBox.boxWindow.setContent(new Element('div', {'html':ajaxEle}))
+									.openWindow();
+								// Run script from response
+								(function(){eval(responseJavaScript)}).call(ceraBox);
+							});
+					}
+
+					if (assets.length)
+						Asset.images(assets, {
+							onComplete: assetsLoaded
+						});
+					else
+						assetsLoaded();
 				},
 				onerror: ceraBox._timedOut.bind(ceraBox),
 				onTimeout: ceraBox._timedOut.bind(ceraBox),
@@ -250,38 +255,42 @@ var CeraBox = CeraBox || new Class({
 		if (null!==inlineEle) {
 
 			// pre load images
-			var assets = [null];
+			var assets = [];
 			Array.each(inlineEle.getElements('img'), function(ele){
 				if(ele.get('src')) {
 					assets.append([ele.get('src')]);
 				}
 			});
 			
-			Asset.images(assets, {
-				onComplete: function(){
+			var assetsLoaded = function(){
+				var inlineEleClone = ceraBox.boxWindow.preLoadElement(inlineEle.clone());
 
-					var inlineEleClone = ceraBox.boxWindow.preLoadElement(inlineEle.clone());
+				inlineEleClone.setStyle('width', ceraBox.options.width?ceraBox.options.width:inlineEleClone.getScrollSize().x + 'px');
+				inlineEleClone.setStyle('height', ceraBox.options.height?ceraBox.options.height:inlineEleClone.getSize().y + 'px');
 
-					inlineEleClone.setStyle('width', ceraBox.options.width?ceraBox.options.width:inlineEleClone.getScrollSize().x + 'px');
-					inlineEleClone.setStyle('height', ceraBox.options.height?ceraBox.options.height:inlineEleClone.getSize().y + 'px');
+				var dimension = ceraBox.boxWindow.getSizeElement(inlineEleClone);
 
-					var dimension = ceraBox.boxWindow.getSizeElement(inlineEleClone);
+				ceraBox.boxWindow.onLoad(dimension.width, dimension.height)
+					.addEvent('complete', function(){
+						this.removeEvents('complete');
 
-					ceraBox.boxWindow.onLoad(dimension.width, dimension.height)
-						.addEvent('complete', function(){
-							this.removeEvents('complete');
+						if (false===ceraBox.boxWindow.getBusy())
+							return;
 
-							if (false===ceraBox.boxWindow.getBusy())
-								return;
+						if (false!==ceraBox.options.displayTitle)
+							ceraBox.boxWindow.displayTitle((currentItem.get('title')?currentItem.get('title'):''), ceraBox.currentItem+1, ceraBox.collection.length);
 
-							if (false!==ceraBox.options.displayTitle)
-								ceraBox.boxWindow.displayTitle((currentItem.get('title')?currentItem.get('title'):''), ceraBox.currentItem+1, ceraBox.collection.length);
+						ceraBox.boxWindow.setContent(inlineEle)
+							.openWindow();
+					});
+			}
 
-							ceraBox.boxWindow.setContent(inlineEle)
-								.openWindow();
-						});
-				}
-			});
+			if (assets.length)
+				Asset.images(assets, {
+					onComplete: assetsLoaded
+				});
+			else
+				assetsLoaded();
 
 		}
 		else {
