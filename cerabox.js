@@ -400,29 +400,35 @@ var CeraBox = CeraBox || new Class({
 							if (false===ceraBox.boxWindow.getBusy() && !ceraBox.boxWindow.getWindowOpen())
 								return;
 
-							try {
-								this.contentWindow.onbeforeunload = function(){
-									this.set('scrolling','no');
-								}.bind(this);
-							}
-							catch(err) {}
+							// No fixed set size try to add onBeforeUnload function
+							if (!ceraBox.options.width && !ceraBox.options.height)
+								try {
+									if (!Browser.ie || Browser.version>8)
+										this.contentWindow.onbeforeunload = function(){
+											ceraBox.boxWindow.loading(ceraBox);
+											this.setStyles({
+												'width': '1px',
+												'height': '1px'
+											});
+										}.bind(this);
+									else
+										this.setStyles({
+											'width': '1px',
+											'height': '1px'
+										});
+								}
+								catch(err) {}
 
 							if (ceraBox.options.width)
 								this.setStyle('width', ceraBox.options.width);
 							if (ceraBox.options.height)
 								this.setStyle('height', ceraBox.options.height);
 
-							// No fixed set size add auto class
-							if (!this.hasClass('auto-size') && !ceraBox.options.width && !ceraBox.options.height)
-								this.addClass('auto-size');
-
 							var dimension = ceraBox.boxWindow.getSizeElement(this);
 
 							ceraBox.boxWindow.onLoad(dimension.width, dimension.height)
 									.addEvent('complete', function(){
 										this.removeEvents('complete');
-
-										ceraIframe.set('scrolling','auto');
 
 										if (false===ceraBox.boxWindow.getBusy() && !ceraBox.boxWindow.getWindowOpen())
 											return;
@@ -944,7 +950,7 @@ var CeraBoxWindow = (function(window) {
 			if (element.get('tag')=='iframe') {
 				cerabox.setStyle('display','block');
 				try {
-					eleWidth = (element.get('width')?sizeStringToInt(element.get('width'),'x'):(element.getStyle('width').toInt()>1&&!element.hasClass('auto-size')?sizeStringToInt(element.getStyle('width'),'x'):
+					eleWidth = (element.get('width')?sizeStringToInt(element.get('width'),'x'):(element.getStyle('width').toInt()>1?sizeStringToInt(element.getStyle('width'),'x'):
 							(element.contentWindow.document.getScrollSize().x?element.contentWindow.document.getScrollSize().x:viewport.x * 0.75)));
 				}
 				catch(err) {
@@ -952,7 +958,7 @@ var CeraBoxWindow = (function(window) {
 				}
 
 				try {
-					eleHeight = (element.get('height')?sizeStringToInt(element.get('height'),'y'):(element.getStyle('height').toInt()>1&&!element.hasClass('auto-size')?sizeStringToInt(element.getStyle('height'),'y'):
+					eleHeight = (element.get('height')?sizeStringToInt(element.get('height'),'y'):(element.getStyle('height').toInt()>1?sizeStringToInt(element.getStyle('height'),'y'):
 							(element.contentWindow.document.getScrollSize().y?element.contentWindow.document.getScrollSize().y:viewport.y * 0.75)));
 				}
 				catch(err) {
