@@ -405,6 +405,7 @@ var CeraBox = CeraBox || new Class({
 								try {
 									if (!Browser.ie || Browser.version>8)
 										this.contentWindow.onbeforeunload = function(){
+											ceraBox.boxWindow.loading(ceraBox);
 											this.setStyles({
 												'width': '1px',
 												'height': '1px'
