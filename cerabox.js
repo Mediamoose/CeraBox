@@ -3,7 +3,7 @@
  *
  * @author 		Sven
  * @since 		13-01-2011
- * @version 	1.3.4
+ * @version 	1.3.5
  *
  * This package requires
  * - MooTools 1.4 >
@@ -34,7 +34,7 @@
 
 var CeraBox = CeraBox || new Class({
 
-	version: '1.3.4',
+	version: '1.3.5',
 
 	Implements: [Options],
 
@@ -60,6 +60,7 @@ var CeraBox = CeraBox || new Class({
 		mobileView:                 Browser.Platform.ios || Browser.Platform.android || Browser.Platform.webos,
 		fixedPosition:              false,
 		clickToCloseOverlay:        true,
+		constrainProportions:       false,
 		events: {
 			onOpen:			function(currentItem, collection){},
 			onChange:		function(currentItem, collection){},
@@ -205,8 +206,23 @@ var CeraBox = CeraBox || new Class({
 						var assetsLoaded = function(){
 							var ajaxEle = ceraBox.boxWindow.preLoadElement(responseTree);
 
-							ajaxEle.setStyle('width', ceraBox.options.width?ceraBox.options.width:ajaxEle.getScrollSize().x + 'px');
-							ajaxEle.setStyle('height', ceraBox.options.height?ceraBox.options.height:ajaxEle.getScrollSize().y + 'px');
+							// Check if size needs to be constrained
+							if( true===ceraBox.options.constrainProportions &&
+									!(ceraBox.options.width && ceraBox.options.height) &&
+									(ceraBox.options.width || ceraBox.options.height)
+									){
+								if (ceraBox.options.width) {
+									ajaxEle.set('height', Math.round(ajaxEle.getScrollSize().y * (ceraBox.boxWindow.sizeStringToInt(ceraBox.options.width, 'x') / ajaxEle.getScrollSize().x) ));
+									ajaxEle.set('width', ceraBox.options.width);
+								} else {
+									ajaxEle.set('width', Math.round(ajaxEle.getScrollSize().x * (ceraBox.boxWindow.sizeStringToInt(ceraBox.options.height, 'y') / ajaxEle.getScrollSize().y) ));
+									ajaxEle.set('height', ceraBox.options.height);
+								}
+							}
+							else {
+								ajaxEle.setStyle('width', ceraBox.options.width?ceraBox.options.width:ajaxEle.getScrollSize().x);
+								ajaxEle.setStyle('height', ceraBox.options.height?ceraBox.options.height:ajaxEle.getScrollSize().y);
+							}
 
 							var dimension = ceraBox.boxWindow.getSizeElement(ajaxEle);
 
@@ -267,8 +283,23 @@ var CeraBox = CeraBox || new Class({
 			var assetsLoaded = function(){
 				var inlineEleClone = ceraBox.boxWindow.preLoadElement(inlineEle.clone());
 
-				inlineEleClone.setStyle('width', ceraBox.options.width?ceraBox.options.width:inlineEleClone.getScrollSize().x + 'px');
-				inlineEleClone.setStyle('height', ceraBox.options.height?ceraBox.options.height:inlineEleClone.getSize().y + 'px');
+				// Check if size needs to be constrained
+				if( true===ceraBox.options.constrainProportions &&
+						!(ceraBox.options.width && ceraBox.options.height) &&
+						(ceraBox.options.width || ceraBox.options.height)
+						){
+					if (ceraBox.options.width) {
+						inlineEleClone.set('height', Math.round(inlineEleClone.getSize().y * (ceraBox.boxWindow.sizeStringToInt(ceraBox.options.width, 'x') / inlineEleClone.getScrollSize().x) ));
+						inlineEleClone.set('width', ceraBox.options.width);
+					} else {
+						inlineEleClone.set('width', Math.round(inlineEleClone.getScrollSize().x * (ceraBox.boxWindow.sizeStringToInt(ceraBox.options.height, 'y') / inlineEleClone.getSize().y) ));
+						inlineEleClone.set('height', ceraBox.options.height);
+					}
+				}
+				else {
+					inlineEleClone.setStyle('width', ceraBox.options.width?ceraBox.options.width:inlineEleClone.getScrollSize().x);
+					inlineEleClone.setStyle('height', ceraBox.options.height?ceraBox.options.height:inlineEleClone.getSize().y);
+				}
 
 				var dimension = ceraBox.boxWindow.getSizeElement(inlineEleClone);
 
@@ -313,8 +344,23 @@ var CeraBox = CeraBox || new Class({
 						if (false===ceraBox.boxWindow.getBusy())
 							return;
 
-						this.set('width', ceraBox.options.width?ceraBox.options.width:this.get('width'));
-						this.set('height', ceraBox.options.height?ceraBox.options.height:this.get('height'));
+						// Check if size needs to be constrained
+						if( true===ceraBox.options.constrainProportions &&
+								!(ceraBox.options.width && ceraBox.options.height) &&
+								(ceraBox.options.width || ceraBox.options.height)
+								){
+							if (ceraBox.options.width) {
+								this.set('height', Math.round(this.get('height').toInt() * (ceraBox.boxWindow.sizeStringToInt(ceraBox.options.width, 'x') / this.get('width')) ));
+								this.set('width', ceraBox.options.width);
+							} else {
+								this.set('width', Math.round(this.get('width').toInt() * (ceraBox.boxWindow.sizeStringToInt(ceraBox.options.height, 'y') / this.get('height')) ));
+								this.set('height', ceraBox.options.height);
+							}
+						}
+						else {
+							this.set('width', ceraBox.options.width?ceraBox.options.width:this.get('width'));
+							this.set('height', ceraBox.options.height?ceraBox.options.height:this.get('height'));
+						}
 
 						var dimension = ceraBox.boxWindow.getSizeElement(this);
 
@@ -646,10 +692,12 @@ var CeraBoxWindow = (function(window) {
 						.addEvent('complete', function() {
 							this.removeEvents('complete');
 
-							document.id('cerabox-background').set('tween', {duration: 50,link:'chain'}).tween('opacity',0).tween('display','none')
+							document.id('cerabox-background').set('tween', {duration: 50,link:'chain'}).tween('opacity',0)
 									.get('tween')
 									.addEvent('chainComplete', function() {
 										this.removeEvents('chainComplete');
+
+										document.id('cerabox-background').setStyle('display', 'none');
 
 										cerabox.setStyles({
 											'display':'none'
@@ -965,9 +1013,9 @@ var CeraBoxWindow = (function(window) {
 					eleHeight = viewport.y * 0.75;
 				}
 
-				if (Browser.ie) {
-					eleHeight = eleHeight + 20;
-				}
+				/*if (Browser.ie) {
+				 eleHeight = eleHeight + 20;
+				 }*/
 
 				if (!forceFullSize && false===currentInstance.options.fullSize) {
 					if ((viewport.y - 100)<eleHeight) {
@@ -989,6 +1037,18 @@ var CeraBoxWindow = (function(window) {
 			}
 			else
 				return {width: eleWidth, height: eleHeight};
+		},
+
+		/**
+		 * Get the pixels of given element size
+		 *
+		 * @param size string
+		 * @param dimension 'x'|'y'
+		 *
+		 * @return int
+		 */
+		sizeStringToInt: function(size, dimension){
+			return sizeStringToInt(size, dimension);
 		}
 	}),
 			_instance = new boxWindow();
@@ -1282,6 +1342,8 @@ var CeraBoxWindow = (function(window) {
 	 *
 	 * @param size string
 	 * @param dimension 'x'|'y'
+	 *
+	 * @return int
 	 */
 	function sizeStringToInt(size, dimension) {
 		return (typeOf(size)=='string' && size.test('%')?viewport[dimension]*(size.toInt()/100):size.toInt());
@@ -1409,12 +1471,6 @@ var CeraBoxWindow = (function(window) {
 		else if (angle>=135 && angle<=225) {
 			cerabox.getElement('.cerabox-left').fireEvent('click', event);
 		}
-		/*else if (angle>45 && angle<135) {
-		 $(this).fireEvent('swipeDown', [event, properties]);
-		 }
-		 else if (angle>225 && angle<315) {
-		 $(this).fireEvent('swipeUp', [event, properties]);
-		 }*/
 		touchCancel();
 	}
 
@@ -1422,10 +1478,15 @@ var CeraBoxWindow = (function(window) {
 })(window);
 
 
-
+// Single element
+Element.implement({
+	cerabox: function(options){
+		return this.store('cerabox', new CeraBox(this, options));
+	}
+});
 
 // Collection
-Array.implement({
+Elements.implement({
 	cerabox: function(options){
 		if (!options || typeOf(options.group)=='null' || options.group===true) {
 			var box = new CeraBox(this, options);
@@ -1439,12 +1500,5 @@ Array.implement({
 			});
 		}
 		return this;
-	}
-});
-
-// Single element
-Element.implement({
-	cerabox: function(options){
-		return this.store('cerabox', new CeraBox(this, options));
 	}
 });
