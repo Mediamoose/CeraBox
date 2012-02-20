@@ -646,10 +646,12 @@ var CeraBoxWindow = (function(window) {
 						.addEvent('complete', function() {
 							this.removeEvents('complete');
 
-							document.id('cerabox-background').set('tween', {duration: 50,link:'chain'}).tween('opacity',0).tween('display','none')
+							document.id('cerabox-background').set('tween', {duration: 50,link:'chain'}).tween('opacity',0)
 									.get('tween')
 									.addEvent('chainComplete', function() {
 										this.removeEvents('chainComplete');
+										
+										document.id('cerabox-background').setStyle('display', 'none');
 
 										cerabox.setStyles({
 											'display':'none'
