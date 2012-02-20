@@ -1409,12 +1409,6 @@ var CeraBoxWindow = (function(window) {
 		else if (angle>=135 && angle<=225) {
 			cerabox.getElement('.cerabox-left').fireEvent('click', event);
 		}
-		/*else if (angle>45 && angle<135) {
-		 $(this).fireEvent('swipeDown', [event, properties]);
-		 }
-		 else if (angle>225 && angle<315) {
-		 $(this).fireEvent('swipeUp', [event, properties]);
-		 }*/
 		touchCancel();
 	}
 
@@ -1422,10 +1416,15 @@ var CeraBoxWindow = (function(window) {
 })(window);
 
 
-
+// Single element
+Element.implement({
+	cerabox: function(options){
+		return this.store('cerabox', new CeraBox(this, options));
+	}
+});
 
 // Collection
-Array.implement({
+Elements.implement({
 	cerabox: function(options){
 		if (!options || typeOf(options.group)=='null' || options.group===true) {
 			var box = new CeraBox(this, options);
@@ -1439,12 +1438,5 @@ Array.implement({
 			});
 		}
 		return this;
-	}
-});
-
-// Single element
-Element.implement({
-	cerabox: function(options){
-		return this.store('cerabox', new CeraBox(this, options));
 	}
 });
