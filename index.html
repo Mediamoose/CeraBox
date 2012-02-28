@@ -20,11 +20,18 @@
 		}
 	</style>
 	<link href="assets/css/bootstrap-responsive.css" rel="stylesheet" />
-	<link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+	<link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet" />
 
 	<!-- Le fav and touch icons -->
 	<link rel="shortcut icon" href="assets/ico/favicon.ico" />
 	<link rel="apple-touch-icon" href="assets/ico/apple-touch-icon.png" />
+
+	<script src="assets/js/mootools/mootools-core-1.4.5.js"></script>
+
+	<!-- Load CeraBox -->
+	<script src="cerabox.js"></script>
+	<link href="style/cerabox.css" rel="stylesheet" media="screen" />
+
 </head>
 
 <body>
@@ -48,23 +55,71 @@
 	<div class="row">
 		<div class="span12">
 			<h2>Advanced usage</h2>
-			<p>Allready know what the CeraBox is all about and just need some advanced usage examples? Then you came to the right place.</p>
+			<p>Already know what the CeraBox is all about and just need some advanced usage examples? Then you came to the right place.</p>
 		</div>
 	</div>
 
 	<hr/>
 
-	<div class="row">
+	<div class="row" id="iframe-onload">
 		<div class="span4">
-			<h3>Test</h3>
-			<p>Sorry, soonish there will be real advanced examples here.</p>
+			<h3><a href="#iframe-onload" style="color:inherit;">Iframe onload test</a></h3>
+			<p>We were asked if it was possible to get an event fired when an iframe was loaded and ready to be used. The problem was that the size of the iframe was still 1x1 when onload is fired.</p>
+			<p>
+				It seems that the onload event of the MooTools element <code>IFrame</code> is fired after the actual onload on the page.
+				Because we cant change that we have to be creative, so I created an <code>onLoad</code> function on the page that will be loaded.
+				And added an <code>onAnimationEnd</code> and <code>onChange</code> event to fire the function.
+			</p>
+			<p>
+				<a href="assets/pages/onload.html" class="btn onload-test">Example 1</a>
+				<a href="assets/pages/onload.html" class="btn onload-test" style="margin-left:10px;">Example 2</a>
+			</p>
 		</div>
 		<div class="span8">
-<pre class="prettyprint linenums">
+			<pre class="prettyprint linenums">
 window.addEvent('domready',function(){
-	alert('test');
-});
-</pre>
+	$$('a.onload-test').cerabox({
+		'events': {
+			'onAnimationEnd': function(){
+				try {
+					$('cerabox').getElement('iframe').contentWindow.onLoad();
+				}catch(err){}
+			},
+			'onChange': function(){
+				try {
+					$('cerabox').getElement('iframe').contentWindow.onLoad();
+				}catch(err){}
+			}
+		}
+	});
+});</pre>
+
+			<h3>Script from iframe &lt;head&gt;</h3>
+			<pre class="prettyprint linenums">
+var onLoad = function(){
+	$('frame-size').set(
+		'text',
+		window.getSize().x + 'x' + window.getSize().y
+	);
+};</pre>
+			<script>
+			window.addEvent('domready',function(){
+				$$('a.onload-test').cerabox({
+					'events': {
+						'onAnimationEnd': function(){
+							try {
+								$('cerabox').getElement('iframe').contentWindow.onLoad();
+							}catch(err){}
+						},
+						'onChange': function(){
+							try {
+								$('cerabox').getElement('iframe').contentWindow.onLoad();
+							}catch(err){}
+						}
+					}
+				});
+			});
+			</script>
 		</div>
 	</div>
 
