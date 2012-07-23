@@ -3,7 +3,7 @@
  *
  * @author 		Sven
  * @since 		13-01-2011
- * @version 	1.3.5
+ * @version 	1.3.6
  *
  * This package requires
  * - MooTools 1.4 >
@@ -34,7 +34,7 @@
 
 var CeraBox = CeraBox || new Class({
 
-	version: '1.3.5',
+	version: '1.3.6',
 
 	Implements: [Options],
 
