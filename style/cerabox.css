@@ -245,3 +245,19 @@
 #cerabox.mobile a.cerabox-left, #cerabox.mobile a.cerabox-right {
 	width: 10%;
 }
+
+/* @2x
+-------------------------------------------------------------------------------*/
+@media  only screen and (-webkit-min-device-pixel-ratio: 2),
+		only screen and (min-device-pixel-ratio: 2) {
+
+	#cerabox-loading div,
+	#cerabox .cerabox-close,
+	#cerabox a.cerabox-left:hover span, #cerabox.mobile a.cerabox-left span,
+	#cerabox a.cerabox-right:hover span, #cerabox.mobile a.cerabox-right span {
+		/* Reference the @2x Sprite */
+		background-image: url('../img/cerabox@2x.png');
+		/* Translate the @2x sprite's dimensions back to 1x */
+		background-size: 82px auto;
+	}
+}
