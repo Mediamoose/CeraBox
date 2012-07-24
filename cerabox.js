@@ -398,11 +398,13 @@ var CeraBox = CeraBox || new Class({
 					width:ceraBox.options.width?ceraBox.options.width:500,
 					height:ceraBox.options.height?ceraBox.options.height:400
 				},
+				swfBase = /(.*)\/.+(\.swf).*/.exec(currentItem.get('href'))[1],
 				swfEr = new Swiff(currentItem.get('href'), {
 					width: dimension.width,
 					height: dimension.height,
 					params: {
-						wMode: 'opaque'
+						wMode: 'opaque',
+						base : swfBase
 					}
 				});
 
