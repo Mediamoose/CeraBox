@@ -941,10 +941,13 @@ window.CeraBoxWindow = (function(window) {
 				});
 			}
 			// Set text if passed else only set display
-			if (text)
-				cerabox.getElement('.cerabox-title span').setStyle('display','block').set('text', text);
-			else
-				cerabox.getElement('.cerabox-title span').setStyle('display','block');
+			var titleElement = cerabox.getElement('.cerabox-title span')
+			if (text) {
+				titleElement.setStyle('display','block').set('text', text);
+				titleElement.set('html', titleElement.get('html').replace('\n', '<br>'));
+			} else {
+				titleElement.setStyle('display','none');
+			}
 
 			return this;
 		},
