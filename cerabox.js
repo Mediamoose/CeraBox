@@ -279,7 +279,7 @@ window.CeraBox = new Class({
 			currentItem = ceraBox.collection[ceraBox.currentItem],
 			inlineEle   = (currentItem.get('href').test(/^#\$/i) && typeOf(window[currentItem.get('href').replace(/^#\$/i,'')])!='null')
 					? ((typeOf(window[currentItem.get('href').replace(/^#\$/i,'')])!='element') ? new Element('div',{'html':window[currentItem.get('href').replace(/^#\$/i,'')]}) : window[currentItem.get('href').replace(/^#\$/i,'')])
-					: (document.id(document.body).getElement(currentItem.get('href')) ? document.id(document.body).getElement(currentItem.get('href')).clone() : null);
+					: (document.id(document.body).getElement(currentItem.get('href')) ? document.id(document.body).getElement(currentItem.get('href')).clone(true, true) : null);
 
 		if (null!==inlineEle) {
 
@@ -292,7 +292,7 @@ window.CeraBox = new Class({
 			});
 
 			var assetsLoaded = function(){
-				var inlineEleClone = ceraBox.boxWindow.preLoadElement(inlineEle.clone());
+				var inlineEleClone = ceraBox.boxWindow.preLoadElement(inlineEle.clone(true, true));
 
 				// Check if size needs to be constrained
 				if( true===ceraBox.options.constrainProportions &&
