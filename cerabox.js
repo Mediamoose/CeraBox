@@ -3,7 +3,7 @@
  *
  * @author 		Sven
  * @since 		13-01-2011
- * @version 	1.3.7
+ * @version 	1.3.8
  *
  * This package requires
  * - MooTools 1.4 >
