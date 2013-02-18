@@ -3,7 +3,7 @@
  *
  * @author 		Sven
  * @since 		13-01-2011
- * @version 	1.3.7
+ * @version 	1.3.8
  *
  * This package requires
  * - MooTools 1.4 >
@@ -36,7 +36,7 @@
 
 window.CeraBox = new Class({
 
-	version: '1.3.7',
+	version: '1.3.8',
 
 	Implements: [Options],
 
@@ -349,7 +349,7 @@ window.CeraBox = new Class({
 		var ceraBox = this,
 			currentItem = ceraBox.collection[ceraBox.currentItem],
 			image = new Asset.image(currentItem.get('href'), {
-				'class': 'image',
+				'class': 'ceraImage',
 				onload: function() {
 
 					if (false===ceraBox.boxWindow.getBusy())
@@ -452,7 +452,7 @@ window.CeraBox = new Class({
 			currentItem = ceraBox.collection[ceraBox.currentItem],
 			ceraIframe  = new IFrame({
 				src: currentItem.get('href'),
-				'class': 'iframe',
+				'class': 'ceraIframe',
 				styles: {
 					width: 1,
 					height: 1,
@@ -837,7 +837,7 @@ window.CeraBoxWindow = (function(window) {
 			};
 
 			return cerabox.getElement('.cerabox-content').set('tween', {duration: currentInstance.options.mobileView?0:300})
-					.tween('opacity', (windowOpen && cerabox.getElement('.cerabox-content iframe')?1:0))
+					.tween('opacity', (windowOpen && cerabox.getElement('.cerabox-content iframe.ceraIframe')?1:0))
 					.get('tween');
 		},
 
@@ -877,7 +877,7 @@ window.CeraBoxWindow = (function(window) {
 				}
 				else {
 					cerabox.getElement('.cerabox-content')
-							.set('tween', {duration: cerabox.getElement('.cerabox-content iframe')?0:200}).tween('opacity',1)
+							.set('tween', {duration: cerabox.getElement('.cerabox-content iframe.ceraIframe')?0:200}).tween('opacity',1)
 							.get('tween')
 							.addEvent('complete', function(){
 								this.removeEvents('complete');
@@ -941,10 +941,13 @@ window.CeraBoxWindow = (function(window) {
 				});
 			}
 			// Set text if passed else only set display
-			if (text)
-				cerabox.getElement('.cerabox-title span').setStyle('display','block').set('text', text);
-			else
-				cerabox.getElement('.cerabox-title span').setStyle('display','block');
+			var titleElement = cerabox.getElement('.cerabox-title span')
+			if (text) {
+				titleElement.setStyle('display','block').set('text', text);
+				titleElement.set('html', titleElement.get('html').replace('\n', '<br>'));
+			} else {
+				titleElement.setStyle('display','none');
+			}
 
 			return this;
 		},
@@ -1128,7 +1131,7 @@ window.CeraBoxWindow = (function(window) {
 		height = height || currentDimension.y;
 
 		// Clear title
-		if (!currentInstance.options.displayTitle || cerabox.getElement('.cerabox-content iframe')) {
+		if (!currentInstance.options.displayTitle || cerabox.getElement('.cerabox-content iframe.ceraIframe')) {
 			_instance.hideTitle();
 		}
 
@@ -1142,7 +1145,7 @@ window.CeraBoxWindow = (function(window) {
 					scale,
 					screenScale;
 
-			if (cerabox.getElement('.cerabox-content iframe')) {
+			if (cerabox.getElement('.cerabox-content iframe.ceraIframe')) {
 
 				scaledWidth = viewport.x,
 						scaledHeight = viewport.y,
@@ -1155,7 +1158,7 @@ window.CeraBoxWindow = (function(window) {
 				});
 			}
 			else {
-				if (!cerabox.getElement('.cerabox-content img')) {
+				if (!cerabox.getElement('.cerabox-content img.ceraImage')) {
 					width = Math.round(viewport.x * (screenWidth / viewport.x));
 					height = Math.round(viewport.y * (screenWidth / viewport.x));
 				}
@@ -1191,15 +1194,15 @@ window.CeraBoxWindow = (function(window) {
 				'top': ((scaledHeight - Math.round(height * scale))/2)
 			});
 
-			if (cerabox.getElement('.cerabox-content iframe'))
-				cerabox.getElement('.cerabox-content iframe').setStyles({'width':Math.round(width * scale),'height':Math.round(height * scale)});
+			if (cerabox.getElement('.cerabox-content iframe.ceraIframe'))
+				cerabox.getElement('.cerabox-content iframe.ceraIframe').setStyles({'width':Math.round(width * scale),'height':Math.round(height * scale)});
 
 			return cerabox.set('tween', {duration: 0}).tween('opacity',1).get('tween');
 		}
 		else {
 
-			if (cerabox.getElement('.cerabox-content iframe'))
-				cerabox.getElement('.cerabox-content iframe').setStyles({'width':width,'height':height});
+			if (cerabox.getElement('.cerabox-content iframe.ceraIframe'))
+				cerabox.getElement('.cerabox-content iframe.ceraIframe').setStyles({'width':width,'height':height});
 
 			var morphObject = {
 				'display':'block',
@@ -1417,7 +1420,7 @@ window.CeraBoxWindow = (function(window) {
 		if (currentInstance.options.mobileView &&
 				!currentInstance.options.clickToClose &&
 				'createTouch' in document &&
-				!cerabox.getElement('.cerabox-content iframe')
+				!cerabox.getElement('.cerabox-content iframe.ceraIframe')
 				) {
 			hudTimer = hideHud.delay(5000);
 		}
