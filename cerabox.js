@@ -920,7 +920,8 @@ window.CeraBoxWindow = (function(window) {
 				currentInstance.options.events.onAnimationEnd.call(currentInstance, currentItem, currentInstance.collection);
 			});
 
-			currentItem.blur();
+			if (document.body.getElement(currentItem))
+				currentItem.blur();
 			windowOpen = true;
 		},
 
