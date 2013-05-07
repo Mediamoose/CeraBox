@@ -945,7 +945,7 @@ window.CeraBoxWindow = (function(window) {
 			var titleElement = cerabox.getElement('.cerabox-title span')
 			if (text) {
 				titleElement.setStyle('display','block').set('text', text);
-				titleElement.set('html', titleElement.get('html').replace('\n', '<br>'));
+				titleElement.set('html', titleElement.get('html').replace(/\n/g, '<br>'));
 			} else {
 				titleElement.setStyle('display','none');
 			}
