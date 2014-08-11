@@ -60,7 +60,7 @@ window.CeraBox = new Class({
 		errorLoadingMessage:	    'The requested content cannot be loaded or might not be supported. Please try again later.',
 		titleFormat:                'Item {number} / {total} {title}',
 		addContentProtectionLayer:  false,
-		mobileView:                 Browser.Platform.ios || Browser.Platform.android || Browser.Platform.webos,
+		mobileView:                 ['ios', 'android', 'webos'].contains(Browser.platform),
 		fixedPosition:              false,
 		clickToCloseOverlay:        true,
 		constrainProportions:       false,
